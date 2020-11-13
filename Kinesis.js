@@ -22,9 +22,11 @@ module.exports = function(RED) {
 		RED.nodes.createNode(this,n);
 		this.awsConfig = RED.nodes.getNode(n.aws);
 		this.region = n.region;
+		this.endpoint = n.endpoint;
 		this.operation = n.operation;
 		this.name = n.name;
 		this.region = this.awsConfig.region;
+		this.endpoint = this.awsConfig.endpoint;
 		this.accessKey = this.awsConfig.accessKey;
 		this.secretKey = this.awsConfig.secretKey;
 
@@ -45,9 +47,15 @@ module.exports = function(RED) {
             AWS.config.update({
                 httpOptions: { agent: new proxy(this.awsConfig.proxy) }
             });
-        }
+				}
+				
+		var constructor_args = { 'region': node.region, 's3ForcePathStyle': true };
 
-		var awsService = new AWS.Kinesis( { 'region': node.region } );
+		if (node.endpoint && node.endpoint !== '') {
+			constructor_args['endpoint'] = new AWS.Endpoint(node.endpoint);
+		}
+
+		var awsService = new AWS.Kinesis( constructor_args );
 
 		node.on("input", function(msg) {
 			node.sendMsg = function (err, data) {
@@ -309,6 +317,7 @@ module.exports = function(RED) {
 			copyArg(msg,"ExclusiveStartShardId",params,undefined,false); 
 			copyArg(msg,"MaxResults",params,undefined,false); 
 			copyArg(msg,"StreamCreationTimestamp",params,undefined,false); 
+			copyArg(msg,"ShardFilter",params,undefined,false); 
 			
 
 			svc.listShards(params,cb);

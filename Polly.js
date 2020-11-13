@@ -22,9 +22,11 @@ module.exports = function(RED) {
 		RED.nodes.createNode(this,n);
 		this.awsConfig = RED.nodes.getNode(n.aws);
 		this.region = n.region;
+		this.endpoint = n.endpoint;
 		this.operation = n.operation;
 		this.name = n.name;
 		this.region = this.awsConfig.region;
+		this.endpoint = this.awsConfig.endpoint;
 		this.accessKey = this.awsConfig.accessKey;
 		this.secretKey = this.awsConfig.secretKey;
 
@@ -45,9 +47,15 @@ module.exports = function(RED) {
             AWS.config.update({
                 httpOptions: { agent: new proxy(this.awsConfig.proxy) }
             });
-        }
+				}
+				
+		var constructor_args = { 'region': node.region, 's3ForcePathStyle': true };
 
-		var awsService = new AWS.Polly( { 'region': node.region } );
+		if (node.endpoint && node.endpoint !== '') {
+			constructor_args['endpoint'] = new AWS.Endpoint(node.endpoint);
+		}
+
+		var awsService = new AWS.Polly( constructor_args );
 
 		node.on("input", function(msg) {
 			node.sendMsg = function (err, data) {
@@ -99,9 +107,9 @@ module.exports = function(RED) {
 			var params={};
 			//copyArgs
 			
-			copyArg(n,"Name",params,undefined,true); 
+			copyArg(n,"Name",params,undefined,false); 
 			
-			copyArg(msg,"Name",params,undefined,true); 
+			copyArg(msg,"Name",params,undefined,false); 
 			
 
 			svc.deleteLexicon(params,cb);
@@ -113,6 +121,7 @@ module.exports = function(RED) {
 			//copyArgs
 			
 			
+			copyArg(msg,"Engine",params,undefined,false); 
 			copyArg(msg,"LanguageCode",params,undefined,false); 
 			copyArg(msg,"IncludeAdditionalLanguageCodes",params,undefined,false); 
 			copyArg(msg,"NextToken",params,undefined,false); 
@@ -126,9 +135,9 @@ module.exports = function(RED) {
 			var params={};
 			//copyArgs
 			
-			copyArg(n,"Name",params,undefined,true); 
+			copyArg(n,"Name",params,undefined,false); 
 			
-			copyArg(msg,"Name",params,undefined,true); 
+			copyArg(msg,"Name",params,undefined,false); 
 			
 
 			svc.getLexicon(params,cb);
@@ -178,11 +187,11 @@ module.exports = function(RED) {
 			var params={};
 			//copyArgs
 			
-			copyArg(n,"Name",params,undefined,true); 
-			copyArg(n,"Content",params,undefined,false); 
+			copyArg(n,"Name",params,undefined,false); 
+			copyArg(n,"Content",params,undefined,true); 
 			
-			copyArg(msg,"Name",params,undefined,true); 
-			copyArg(msg,"Content",params,undefined,false); 
+			copyArg(msg,"Name",params,undefined,false); 
+			copyArg(msg,"Content",params,undefined,true); 
 			
 
 			svc.putLexicon(params,cb);
@@ -198,6 +207,8 @@ module.exports = function(RED) {
 			copyArg(n,"Text",params,undefined,false); 
 			copyArg(n,"VoiceId",params,undefined,false); 
 			
+			copyArg(msg,"Engine",params,undefined,false); 
+			copyArg(msg,"LanguageCode",params,undefined,false); 
 			copyArg(msg,"LexiconNames",params,undefined,true); 
 			copyArg(msg,"OutputFormat",params,undefined,false); 
 			copyArg(msg,"OutputS3BucketName",params,undefined,false); 
@@ -208,7 +219,6 @@ module.exports = function(RED) {
 			copyArg(msg,"Text",params,undefined,false); 
 			copyArg(msg,"TextType",params,undefined,false); 
 			copyArg(msg,"VoiceId",params,undefined,false); 
-			copyArg(msg,"LanguageCode",params,undefined,false); 
 			
 
 			svc.startSpeechSynthesisTask(params,cb);
@@ -223,6 +233,8 @@ module.exports = function(RED) {
 			copyArg(n,"Text",params,undefined,false); 
 			copyArg(n,"VoiceId",params,undefined,false); 
 			
+			copyArg(msg,"Engine",params,undefined,false); 
+			copyArg(msg,"LanguageCode",params,undefined,false); 
 			copyArg(msg,"LexiconNames",params,undefined,true); 
 			copyArg(msg,"OutputFormat",params,undefined,false); 
 			copyArg(msg,"SampleRate",params,undefined,false); 
@@ -230,7 +242,6 @@ module.exports = function(RED) {
 			copyArg(msg,"Text",params,undefined,false); 
 			copyArg(msg,"TextType",params,undefined,false); 
 			copyArg(msg,"VoiceId",params,undefined,false); 
-			copyArg(msg,"LanguageCode",params,undefined,false); 
 			
 
 			svc.synthesizeSpeech(params,cb);

@@ -22,9 +22,11 @@ module.exports = function(RED) {
 		RED.nodes.createNode(this,n);
 		this.awsConfig = RED.nodes.getNode(n.aws);
 		this.region = n.region;
+		this.endpoint = n.endpoint;
 		this.operation = n.operation;
 		this.name = n.name;
 		this.region = this.awsConfig.region;
+		this.endpoint = this.awsConfig.endpoint;
 		this.accessKey = this.awsConfig.accessKey;
 		this.secretKey = this.awsConfig.secretKey;
 
@@ -45,9 +47,15 @@ module.exports = function(RED) {
             AWS.config.update({
                 httpOptions: { agent: new proxy(this.awsConfig.proxy) }
             });
-        }
+				}
+				
+		var constructor_args = { 'region': node.region, 's3ForcePathStyle': true };
 
-		var awsService = new AWS.KMS( { 'region': node.region } );
+		if (node.endpoint && node.endpoint !== '') {
+			constructor_args['endpoint'] = new AWS.Endpoint(node.endpoint);
+		}
+
+		var awsService = new AWS.KMS( constructor_args );
 
 		node.on("input", function(msg) {
 			node.sendMsg = function (err, data) {
@@ -108,6 +116,19 @@ module.exports = function(RED) {
 		}
 
 		
+		service.ConnectCustomKeyStore=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"CustomKeyStoreId",params,undefined,false); 
+			
+			copyArg(msg,"CustomKeyStoreId",params,undefined,false); 
+			
+
+			svc.connectCustomKeyStore(params,cb);
+		}
+
+		
 		service.CreateAlias=function(svc,msg,cb){
 			var params={};
 			//copyArgs
@@ -120,6 +141,25 @@ module.exports = function(RED) {
 			
 
 			svc.createAlias(params,cb);
+		}
+
+		
+		service.CreateCustomKeyStore=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"CustomKeyStoreName",params,undefined,false); 
+			copyArg(n,"CloudHsmClusterId",params,undefined,false); 
+			copyArg(n,"TrustAnchorCertificate",params,undefined,false); 
+			copyArg(n,"KeyStorePassword",params,undefined,true); 
+			
+			copyArg(msg,"CustomKeyStoreName",params,undefined,false); 
+			copyArg(msg,"CloudHsmClusterId",params,undefined,false); 
+			copyArg(msg,"TrustAnchorCertificate",params,undefined,false); 
+			copyArg(msg,"KeyStorePassword",params,undefined,true); 
+			
+
+			svc.createCustomKeyStore(params,cb);
 		}
 
 		
@@ -152,7 +192,9 @@ module.exports = function(RED) {
 			copyArg(msg,"Policy",params,undefined,false); 
 			copyArg(msg,"Description",params,undefined,false); 
 			copyArg(msg,"KeyUsage",params,undefined,false); 
+			copyArg(msg,"CustomerMasterKeySpec",params,undefined,false); 
 			copyArg(msg,"Origin",params,undefined,false); 
+			copyArg(msg,"CustomKeyStoreId",params,undefined,false); 
 			copyArg(msg,"BypassPolicyLockoutSafetyCheck",params,undefined,false); 
 			copyArg(msg,"Tags",params,undefined,true); 
 			
@@ -170,6 +212,8 @@ module.exports = function(RED) {
 			copyArg(msg,"CiphertextBlob",params,undefined,false); 
 			copyArg(msg,"EncryptionContext",params,undefined,true); 
 			copyArg(msg,"GrantTokens",params,undefined,true); 
+			copyArg(msg,"KeyId",params,undefined,false); 
+			copyArg(msg,"EncryptionAlgorithm",params,undefined,false); 
 			
 
 			svc.decrypt(params,cb);
@@ -189,6 +233,19 @@ module.exports = function(RED) {
 		}
 
 		
+		service.DeleteCustomKeyStore=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"CustomKeyStoreId",params,undefined,false); 
+			
+			copyArg(msg,"CustomKeyStoreId",params,undefined,false); 
+			
+
+			svc.deleteCustomKeyStore(params,cb);
+		}
+
+		
 		service.DeleteImportedKeyMaterial=function(svc,msg,cb){
 			var params={};
 			//copyArgs
@@ -199,6 +256,21 @@ module.exports = function(RED) {
 			
 
 			svc.deleteImportedKeyMaterial(params,cb);
+		}
+
+		
+		service.DescribeCustomKeyStores=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			
+			copyArg(msg,"CustomKeyStoreId",params,undefined,false); 
+			copyArg(msg,"CustomKeyStoreName",params,undefined,false); 
+			copyArg(msg,"Limit",params,undefined,false); 
+			copyArg(msg,"Marker",params,undefined,false); 
+			
+
+			svc.describeCustomKeyStores(params,cb);
 		}
 
 		
@@ -242,6 +314,19 @@ module.exports = function(RED) {
 		}
 
 		
+		service.DisconnectCustomKeyStore=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"CustomKeyStoreId",params,undefined,false); 
+			
+			copyArg(msg,"CustomKeyStoreId",params,undefined,false); 
+			
+
+			svc.disconnectCustomKeyStore(params,cb);
+		}
+
+		
 		service.EnableKey=function(svc,msg,cb){
 			var params={};
 			//copyArgs
@@ -279,6 +364,7 @@ module.exports = function(RED) {
 			copyArg(msg,"Plaintext",params,undefined,true); 
 			copyArg(msg,"EncryptionContext",params,undefined,true); 
 			copyArg(msg,"GrantTokens",params,undefined,true); 
+			copyArg(msg,"EncryptionAlgorithm",params,undefined,false); 
 			
 
 			svc.encrypt(params,cb);
@@ -299,6 +385,40 @@ module.exports = function(RED) {
 			
 
 			svc.generateDataKey(params,cb);
+		}
+
+		
+		service.GenerateDataKeyPair=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"KeyId",params,undefined,false); 
+			copyArg(n,"KeyPairSpec",params,undefined,false); 
+			
+			copyArg(msg,"EncryptionContext",params,undefined,true); 
+			copyArg(msg,"KeyId",params,undefined,false); 
+			copyArg(msg,"KeyPairSpec",params,undefined,false); 
+			copyArg(msg,"GrantTokens",params,undefined,true); 
+			
+
+			svc.generateDataKeyPair(params,cb);
+		}
+
+		
+		service.GenerateDataKeyPairWithoutPlaintext=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"KeyId",params,undefined,false); 
+			copyArg(n,"KeyPairSpec",params,undefined,false); 
+			
+			copyArg(msg,"EncryptionContext",params,undefined,true); 
+			copyArg(msg,"KeyId",params,undefined,false); 
+			copyArg(msg,"KeyPairSpec",params,undefined,false); 
+			copyArg(msg,"GrantTokens",params,undefined,true); 
+			
+
+			svc.generateDataKeyPairWithoutPlaintext(params,cb);
 		}
 
 		
@@ -325,6 +445,7 @@ module.exports = function(RED) {
 			
 			
 			copyArg(msg,"NumberOfBytes",params,undefined,false); 
+			copyArg(msg,"CustomKeyStoreId",params,undefined,false); 
 			
 
 			svc.generateRandom(params,cb);
@@ -373,6 +494,20 @@ module.exports = function(RED) {
 			
 
 			svc.getParametersForImport(params,cb);
+		}
+
+		
+		service.GetPublicKey=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"KeyId",params,undefined,false); 
+			
+			copyArg(msg,"KeyId",params,undefined,false); 
+			copyArg(msg,"GrantTokens",params,undefined,true); 
+			
+
+			svc.getPublicKey(params,cb);
 		}
 
 		
@@ -509,8 +644,11 @@ module.exports = function(RED) {
 			
 			copyArg(msg,"CiphertextBlob",params,undefined,false); 
 			copyArg(msg,"SourceEncryptionContext",params,undefined,true); 
+			copyArg(msg,"SourceKeyId",params,undefined,false); 
 			copyArg(msg,"DestinationKeyId",params,undefined,false); 
 			copyArg(msg,"DestinationEncryptionContext",params,undefined,true); 
+			copyArg(msg,"SourceEncryptionAlgorithm",params,undefined,false); 
+			copyArg(msg,"DestinationEncryptionAlgorithm",params,undefined,false); 
 			copyArg(msg,"GrantTokens",params,undefined,true); 
 			
 
@@ -561,6 +699,25 @@ module.exports = function(RED) {
 		}
 
 		
+		service.Sign=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"KeyId",params,undefined,false); 
+			copyArg(n,"Message",params,undefined,true); 
+			copyArg(n,"SigningAlgorithm",params,undefined,false); 
+			
+			copyArg(msg,"KeyId",params,undefined,false); 
+			copyArg(msg,"Message",params,undefined,true); 
+			copyArg(msg,"MessageType",params,undefined,false); 
+			copyArg(msg,"GrantTokens",params,undefined,true); 
+			copyArg(msg,"SigningAlgorithm",params,undefined,false); 
+			
+
+			svc.sign(params,cb);
+		}
+
+		
 		service.TagResource=function(svc,msg,cb){
 			var params={};
 			//copyArgs
@@ -606,6 +763,22 @@ module.exports = function(RED) {
 		}
 
 		
+		service.UpdateCustomKeyStore=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"CustomKeyStoreId",params,undefined,false); 
+			
+			copyArg(msg,"CustomKeyStoreId",params,undefined,false); 
+			copyArg(msg,"NewCustomKeyStoreName",params,undefined,false); 
+			copyArg(msg,"KeyStorePassword",params,undefined,true); 
+			copyArg(msg,"CloudHsmClusterId",params,undefined,false); 
+			
+
+			svc.updateCustomKeyStore(params,cb);
+		}
+
+		
 		service.UpdateKeyDescription=function(svc,msg,cb){
 			var params={};
 			//copyArgs
@@ -618,6 +791,27 @@ module.exports = function(RED) {
 			
 
 			svc.updateKeyDescription(params,cb);
+		}
+
+		
+		service.Verify=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"KeyId",params,undefined,false); 
+			copyArg(n,"Message",params,undefined,true); 
+			copyArg(n,"Signature",params,undefined,false); 
+			copyArg(n,"SigningAlgorithm",params,undefined,false); 
+			
+			copyArg(msg,"KeyId",params,undefined,false); 
+			copyArg(msg,"Message",params,undefined,true); 
+			copyArg(msg,"MessageType",params,undefined,false); 
+			copyArg(msg,"Signature",params,undefined,false); 
+			copyArg(msg,"SigningAlgorithm",params,undefined,false); 
+			copyArg(msg,"GrantTokens",params,undefined,true); 
+			
+
+			svc.verify(params,cb);
 		}
 
 			

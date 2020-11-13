@@ -22,9 +22,11 @@ module.exports = function(RED) {
 		RED.nodes.createNode(this,n);
 		this.awsConfig = RED.nodes.getNode(n.aws);
 		this.region = n.region;
+		this.endpoint = n.endpoint;
 		this.operation = n.operation;
 		this.name = n.name;
 		this.region = this.awsConfig.region;
+		this.endpoint = this.awsConfig.endpoint;
 		this.accessKey = this.awsConfig.accessKey;
 		this.secretKey = this.awsConfig.secretKey;
 
@@ -45,9 +47,15 @@ module.exports = function(RED) {
             AWS.config.update({
                 httpOptions: { agent: new proxy(this.awsConfig.proxy) }
             });
-        }
+				}
+				
+		var constructor_args = { 'region': node.region, 's3ForcePathStyle': true };
 
-		var awsService = new AWS.ResourceGroupsTaggingAPI( { 'region': node.region } );
+		if (node.endpoint && node.endpoint !== '') {
+			constructor_args['endpoint'] = new AWS.Endpoint(node.endpoint);
+		}
+
+		var awsService = new AWS.ResourceGroupsTaggingAPI( constructor_args );
 
 		node.on("input", function(msg) {
 			node.sendMsg = function (err, data) {
@@ -95,6 +103,35 @@ module.exports = function(RED) {
 		var service={};
 
 		
+		service.DescribeReportCreation=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			
+			
+
+			svc.describeReportCreation(params,cb);
+		}
+
+		
+		service.GetComplianceSummary=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			
+			copyArg(msg,"TargetIdFilters",params,undefined,false); 
+			copyArg(msg,"RegionFilters",params,undefined,false); 
+			copyArg(msg,"ResourceTypeFilters",params,undefined,true); 
+			copyArg(msg,"TagKeyFilters",params,undefined,false); 
+			copyArg(msg,"GroupBy",params,undefined,false); 
+			copyArg(msg,"MaxResults",params,undefined,false); 
+			copyArg(msg,"PaginationToken",params,undefined,false); 
+			
+
+			svc.getComplianceSummary(params,cb);
+		}
+
+		
 		service.GetResources=function(svc,msg,cb){
 			var params={};
 			//copyArgs
@@ -104,7 +141,9 @@ module.exports = function(RED) {
 			copyArg(msg,"TagFilters",params,undefined,false); 
 			copyArg(msg,"ResourcesPerPage",params,undefined,false); 
 			copyArg(msg,"TagsPerPage",params,undefined,false); 
-			copyArg(msg,"ResourceTypeFilters",params,undefined,false); 
+			copyArg(msg,"ResourceTypeFilters",params,undefined,true); 
+			copyArg(msg,"IncludeComplianceDetails",params,undefined,false); 
+			copyArg(msg,"ExcludeCompliantResources",params,undefined,false); 
 			
 
 			svc.getResources(params,cb);
@@ -134,6 +173,19 @@ module.exports = function(RED) {
 			
 
 			svc.getTagValues(params,cb);
+		}
+
+		
+		service.StartReportCreation=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"S3Bucket",params,undefined,false); 
+			
+			copyArg(msg,"S3Bucket",params,undefined,false); 
+			
+
+			svc.startReportCreation(params,cb);
 		}
 
 		

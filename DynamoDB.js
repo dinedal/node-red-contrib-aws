@@ -22,9 +22,11 @@ module.exports = function(RED) {
 		RED.nodes.createNode(this,n);
 		this.awsConfig = RED.nodes.getNode(n.aws);
 		this.region = n.region;
+		this.endpoint = n.endpoint;
 		this.operation = n.operation;
 		this.name = n.name;
 		this.region = this.awsConfig.region;
+		this.endpoint = this.awsConfig.endpoint;
 		this.accessKey = this.awsConfig.accessKey;
 		this.secretKey = this.awsConfig.secretKey;
 
@@ -45,9 +47,15 @@ module.exports = function(RED) {
             AWS.config.update({
                 httpOptions: { agent: new proxy(this.awsConfig.proxy) }
             });
-        }
+				}
+				
+		var constructor_args = { 'region': node.region, 's3ForcePathStyle': true };
 
-		var awsService = new AWS.DynamoDB( { 'region': node.region } );
+		if (node.endpoint && node.endpoint !== '') {
+			constructor_args['endpoint'] = new AWS.Endpoint(node.endpoint);
+		}
+
+		var awsService = new AWS.DynamoDB( constructor_args );
 
 		node.on("input", function(msg) {
 			node.sendMsg = function (err, data) {
@@ -161,16 +169,17 @@ module.exports = function(RED) {
 			copyArg(n,"AttributeDefinitions",params,undefined,true); 
 			copyArg(n,"TableName",params,undefined,false); 
 			copyArg(n,"KeySchema",params,undefined,true); 
-			copyArg(n,"ProvisionedThroughput",params,undefined,true); 
 			
 			copyArg(msg,"AttributeDefinitions",params,undefined,true); 
 			copyArg(msg,"TableName",params,undefined,false); 
 			copyArg(msg,"KeySchema",params,undefined,true); 
-			copyArg(msg,"LocalSecondaryIndexes",params,undefined,false); 
-			copyArg(msg,"GlobalSecondaryIndexes",params,undefined,false); 
+			copyArg(msg,"LocalSecondaryIndexes",params,undefined,true); 
+			copyArg(msg,"GlobalSecondaryIndexes",params,undefined,true); 
+			copyArg(msg,"BillingMode",params,undefined,false); 
 			copyArg(msg,"ProvisionedThroughput",params,undefined,true); 
 			copyArg(msg,"StreamSpecification",params,undefined,true); 
 			copyArg(msg,"SSESpecification",params,undefined,true); 
+			copyArg(msg,"Tags",params,undefined,true); 
 			
 
 			svc.createTable(params,cb);
@@ -252,6 +261,20 @@ module.exports = function(RED) {
 		}
 
 		
+		service.DescribeContributorInsights=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"TableName",params,undefined,false); 
+			
+			copyArg(msg,"TableName",params,undefined,false); 
+			copyArg(msg,"IndexName",params,undefined,false); 
+			
+
+			svc.describeContributorInsights(params,cb);
+		}
+
+		
 		service.DescribeEndpoints=function(svc,msg,cb){
 			var params={};
 			//copyArgs
@@ -260,6 +283,19 @@ module.exports = function(RED) {
 			
 
 			svc.describeEndpoints(params,cb);
+		}
+
+		
+		service.DescribeExport=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"ExportArn",params,undefined,false); 
+			
+			copyArg(msg,"ExportArn",params,undefined,false); 
+			
+
+			svc.describeExport(params,cb);
 		}
 
 		
@@ -313,6 +349,19 @@ module.exports = function(RED) {
 		}
 
 		
+		service.DescribeTableReplicaAutoScaling=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"TableName",params,undefined,false); 
+			
+			copyArg(msg,"TableName",params,undefined,false); 
+			
+
+			svc.describeTableReplicaAutoScaling(params,cb);
+		}
+
+		
 		service.DescribeTimeToLive=function(svc,msg,cb){
 			var params={};
 			//copyArgs
@@ -323,6 +372,28 @@ module.exports = function(RED) {
 			
 
 			svc.describeTimeToLive(params,cb);
+		}
+
+		
+		service.ExportTableToPointInTime=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"TableArn",params,undefined,false); 
+			copyArg(n,"S3Bucket",params,undefined,false); 
+			
+			copyArg(msg,"TableArn",params,undefined,false); 
+			copyArg(msg,"ExportTime",params,undefined,false); 
+			copyArg(msg,"ClientToken",params,undefined,false); 
+			copyArg(msg,"S3Bucket",params,undefined,false); 
+			copyArg(msg,"S3BucketOwner",params,undefined,false); 
+			copyArg(msg,"S3Prefix",params,undefined,false); 
+			copyArg(msg,"S3SseAlgorithm",params,undefined,false); 
+			copyArg(msg,"S3SseKmsKeyId",params,undefined,false); 
+			copyArg(msg,"ExportFormat",params,undefined,false); 
+			
+
+			svc.exportTableToPointInTime(params,cb);
 		}
 
 		
@@ -360,6 +431,34 @@ module.exports = function(RED) {
 			
 
 			svc.listBackups(params,cb);
+		}
+
+		
+		service.ListContributorInsights=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			
+			copyArg(msg,"TableName",params,undefined,false); 
+			copyArg(msg,"NextToken",params,undefined,false); 
+			copyArg(msg,"MaxResults",params,undefined,false); 
+			
+
+			svc.listContributorInsights(params,cb);
+		}
+
+		
+		service.ListExports=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			
+			copyArg(msg,"TableArn",params,undefined,false); 
+			copyArg(msg,"MaxResults",params,undefined,false); 
+			copyArg(msg,"NextToken",params,undefined,false); 
+			
+
+			svc.listExports(params,cb);
 		}
 
 		
@@ -465,6 +564,11 @@ module.exports = function(RED) {
 			
 			copyArg(msg,"TargetTableName",params,undefined,false); 
 			copyArg(msg,"BackupArn",params,undefined,false); 
+			copyArg(msg,"BillingModeOverride",params,undefined,false); 
+			copyArg(msg,"GlobalSecondaryIndexOverride",params,undefined,true); 
+			copyArg(msg,"LocalSecondaryIndexOverride",params,undefined,true); 
+			copyArg(msg,"ProvisionedThroughputOverride",params,undefined,true); 
+			copyArg(msg,"SSESpecificationOverride",params,undefined,true); 
 			
 
 			svc.restoreTableFromBackup(params,cb);
@@ -475,13 +579,18 @@ module.exports = function(RED) {
 			var params={};
 			//copyArgs
 			
-			copyArg(n,"SourceTableName",params,undefined,false); 
 			copyArg(n,"TargetTableName",params,undefined,false); 
 			
+			copyArg(msg,"SourceTableArn",params,undefined,false); 
 			copyArg(msg,"SourceTableName",params,undefined,false); 
 			copyArg(msg,"TargetTableName",params,undefined,false); 
 			copyArg(msg,"UseLatestRestorableTime",params,undefined,false); 
 			copyArg(msg,"RestoreDateTime",params,undefined,false); 
+			copyArg(msg,"BillingModeOverride",params,undefined,false); 
+			copyArg(msg,"GlobalSecondaryIndexOverride",params,undefined,true); 
+			copyArg(msg,"LocalSecondaryIndexOverride",params,undefined,true); 
+			copyArg(msg,"ProvisionedThroughputOverride",params,undefined,true); 
+			copyArg(msg,"SSESpecificationOverride",params,undefined,true); 
 			
 
 			svc.restoreTableToPointInTime(params,cb);
@@ -531,6 +640,36 @@ module.exports = function(RED) {
 		}
 
 		
+		service.TransactGetItems=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"TransactItems",params,undefined,false); 
+			
+			copyArg(msg,"TransactItems",params,undefined,false); 
+			copyArg(msg,"ReturnConsumedCapacity",params,undefined,false); 
+			
+
+			svc.transactGetItems(params,cb);
+		}
+
+		
+		service.TransactWriteItems=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"TransactItems",params,undefined,false); 
+			
+			copyArg(msg,"TransactItems",params,undefined,false); 
+			copyArg(msg,"ReturnConsumedCapacity",params,undefined,false); 
+			copyArg(msg,"ReturnItemCollectionMetrics",params,undefined,false); 
+			copyArg(msg,"ClientRequestToken",params,undefined,false); 
+			
+
+			svc.transactWriteItems(params,cb);
+		}
+
+		
 		service.UntagResource=function(svc,msg,cb){
 			var params={};
 			//copyArgs
@@ -561,6 +700,22 @@ module.exports = function(RED) {
 		}
 
 		
+		service.UpdateContributorInsights=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"TableName",params,undefined,false); 
+			copyArg(n,"ContributorInsightsAction",params,undefined,false); 
+			
+			copyArg(msg,"TableName",params,undefined,false); 
+			copyArg(msg,"IndexName",params,undefined,false); 
+			copyArg(msg,"ContributorInsightsAction",params,undefined,false); 
+			
+
+			svc.updateContributorInsights(params,cb);
+		}
+
+		
 		service.UpdateGlobalTable=function(svc,msg,cb){
 			var params={};
 			//copyArgs
@@ -583,6 +738,7 @@ module.exports = function(RED) {
 			copyArg(n,"GlobalTableName",params,undefined,false); 
 			
 			copyArg(msg,"GlobalTableName",params,undefined,false); 
+			copyArg(msg,"GlobalTableBillingMode",params,undefined,false); 
 			copyArg(msg,"GlobalTableProvisionedWriteCapacityUnits",params,undefined,false); 
 			copyArg(msg,"GlobalTableProvisionedWriteCapacityAutoScalingSettingsUpdate",params,undefined,true); 
 			copyArg(msg,"GlobalTableGlobalSecondaryIndexSettingsUpdate",params,undefined,false); 
@@ -626,13 +782,31 @@ module.exports = function(RED) {
 			
 			copyArg(msg,"AttributeDefinitions",params,undefined,true); 
 			copyArg(msg,"TableName",params,undefined,false); 
+			copyArg(msg,"BillingMode",params,undefined,false); 
 			copyArg(msg,"ProvisionedThroughput",params,undefined,true); 
 			copyArg(msg,"GlobalSecondaryIndexUpdates",params,undefined,false); 
 			copyArg(msg,"StreamSpecification",params,undefined,true); 
 			copyArg(msg,"SSESpecification",params,undefined,true); 
+			copyArg(msg,"ReplicaUpdates",params,undefined,false); 
 			
 
 			svc.updateTable(params,cb);
+		}
+
+		
+		service.UpdateTableReplicaAutoScaling=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"TableName",params,undefined,false); 
+			
+			copyArg(msg,"GlobalSecondaryIndexUpdates",params,undefined,false); 
+			copyArg(msg,"TableName",params,undefined,false); 
+			copyArg(msg,"ProvisionedWriteCapacityAutoScalingUpdate",params,undefined,true); 
+			copyArg(msg,"ReplicaUpdates",params,undefined,false); 
+			
+
+			svc.updateTableReplicaAutoScaling(params,cb);
 		}
 
 		

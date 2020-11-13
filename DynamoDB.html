@@ -48,7 +48,11 @@
 		
 			<option value="DescribeContinuousBackups">DescribeContinuousBackups</option>
 		
+			<option value="DescribeContributorInsights">DescribeContributorInsights</option>
+		
 			<option value="DescribeEndpoints">DescribeEndpoints</option>
+		
+			<option value="DescribeExport">DescribeExport</option>
 		
 			<option value="DescribeGlobalTable">DescribeGlobalTable</option>
 		
@@ -58,11 +62,19 @@
 		
 			<option value="DescribeTable">DescribeTable</option>
 		
+			<option value="DescribeTableReplicaAutoScaling">DescribeTableReplicaAutoScaling</option>
+		
 			<option value="DescribeTimeToLive">DescribeTimeToLive</option>
+		
+			<option value="ExportTableToPointInTime">ExportTableToPointInTime</option>
 		
 			<option value="GetItem">GetItem</option>
 		
 			<option value="ListBackups">ListBackups</option>
+		
+			<option value="ListContributorInsights">ListContributorInsights</option>
+		
+			<option value="ListExports">ListExports</option>
 		
 			<option value="ListGlobalTables">ListGlobalTables</option>
 		
@@ -82,9 +94,15 @@
 		
 			<option value="TagResource">TagResource</option>
 		
+			<option value="TransactGetItems">TransactGetItems</option>
+		
+			<option value="TransactWriteItems">TransactWriteItems</option>
+		
 			<option value="UntagResource">UntagResource</option>
 		
 			<option value="UpdateContinuousBackups">UpdateContinuousBackups</option>
+		
+			<option value="UpdateContributorInsights">UpdateContributorInsights</option>
 		
 			<option value="UpdateGlobalTable">UpdateGlobalTable</option>
 		
@@ -93,6 +111,8 @@
 			<option value="UpdateItem">UpdateItem</option>
 		
 			<option value="UpdateTable">UpdateTable</option>
+		
+			<option value="UpdateTableReplicaAutoScaling">UpdateTableReplicaAutoScaling</option>
 		
 			<option value="UpdateTimeToLive">UpdateTimeToLive</option>
 		;
@@ -133,10 +153,6 @@
 		<label for="node-input-KeySchema"><i class="fa fa-tag"></i>KeySchema</label>
 		<input type="text" id="node-input-KeySchema" placeholder="KeySchema"></input>
 	</div> 
-	<div class="form-row" id='ProvisionedThroughputAttr' class='hiddenAttrs'>
-		<label for="node-input-ProvisionedThroughput"><i class="fa fa-tag"></i>ProvisionedThroughput</label>
-		<input type="text" id="node-input-ProvisionedThroughput" placeholder="ProvisionedThroughput"></input>
-	</div> 
 	<div class="form-row" id='BackupArnAttr' class='hiddenAttrs'>
 		<label for="node-input-BackupArn"><i class="fa fa-tag"></i>BackupArn</label>
 		<input type="text" id="node-input-BackupArn" placeholder="BackupArn"></input>
@@ -144,6 +160,18 @@
 	<div class="form-row" id='KeyAttr' class='hiddenAttrs'>
 		<label for="node-input-Key"><i class="fa fa-tag"></i>Key</label>
 		<input type="text" id="node-input-Key" placeholder="Key"></input>
+	</div> 
+	<div class="form-row" id='ExportArnAttr' class='hiddenAttrs'>
+		<label for="node-input-ExportArn"><i class="fa fa-tag"></i>ExportArn</label>
+		<input type="text" id="node-input-ExportArn" placeholder="ExportArn"></input>
+	</div> 
+	<div class="form-row" id='TableArnAttr' class='hiddenAttrs'>
+		<label for="node-input-TableArn"><i class="fa fa-tag"></i>TableArn</label>
+		<input type="text" id="node-input-TableArn" placeholder="TableArn"></input>
+	</div> 
+	<div class="form-row" id='S3BucketAttr' class='hiddenAttrs'>
+		<label for="node-input-S3Bucket"><i class="fa fa-tag"></i>S3Bucket</label>
+		<input type="text" id="node-input-S3Bucket" placeholder="S3Bucket"></input>
 	</div> 
 	<div class="form-row" id='ResourceArnAttr' class='hiddenAttrs'>
 		<label for="node-input-ResourceArn"><i class="fa fa-tag"></i>ResourceArn</label>
@@ -157,13 +185,13 @@
 		<label for="node-input-TargetTableName"><i class="fa fa-tag"></i>TargetTableName</label>
 		<input type="text" id="node-input-TargetTableName" placeholder="TargetTableName"></input>
 	</div> 
-	<div class="form-row" id='SourceTableNameAttr' class='hiddenAttrs'>
-		<label for="node-input-SourceTableName"><i class="fa fa-tag"></i>SourceTableName</label>
-		<input type="text" id="node-input-SourceTableName" placeholder="SourceTableName"></input>
-	</div> 
 	<div class="form-row" id='TagsAttr' class='hiddenAttrs'>
 		<label for="node-input-Tags"><i class="fa fa-tag"></i>Tags</label>
 		<input type="text" id="node-input-Tags" placeholder="Tags"></input>
+	</div> 
+	<div class="form-row" id='TransactItemsAttr' class='hiddenAttrs'>
+		<label for="node-input-TransactItems"><i class="fa fa-tag"></i>TransactItems</label>
+		<input type="text" id="node-input-TransactItems" placeholder="TransactItems"></input>
 	</div> 
 	<div class="form-row" id='TagKeysAttr' class='hiddenAttrs'>
 		<label for="node-input-TagKeys"><i class="fa fa-tag"></i>TagKeys</label>
@@ -172,6 +200,10 @@
 	<div class="form-row" id='PointInTimeRecoverySpecificationAttr' class='hiddenAttrs'>
 		<label for="node-input-PointInTimeRecoverySpecification"><i class="fa fa-tag"></i>PointInTimeRecoverySpecification</label>
 		<input type="text" id="node-input-PointInTimeRecoverySpecification" placeholder="PointInTimeRecoverySpecification"></input>
+	</div> 
+	<div class="form-row" id='ContributorInsightsActionAttr' class='hiddenAttrs'>
+		<label for="node-input-ContributorInsightsAction"><i class="fa fa-tag"></i>ContributorInsightsAction</label>
+		<input type="text" id="node-input-ContributorInsightsAction" placeholder="ContributorInsightsAction"></input>
 	</div> 
 	<div class="form-row" id='ReplicaUpdatesAttr' class='hiddenAttrs'>
 		<label for="node-input-ReplicaUpdates"><i class="fa fa-tag"></i>ReplicaUpdates</label>
@@ -199,7 +231,7 @@
 					'#GlobalTableNameAttr','#ReplicationGroupAttr'
 					],
 				CreateTable:[
-					'#AttributeDefinitionsAttr','#TableNameAttr','#KeySchemaAttr','#ProvisionedThroughputAttr'
+					'#AttributeDefinitionsAttr','#TableNameAttr','#KeySchemaAttr'
 					],
 				DeleteBackup:[
 					'#BackupArnAttr'
@@ -216,8 +248,14 @@
 				DescribeContinuousBackups:[
 					'#TableNameAttr'
 					],
+				DescribeContributorInsights:[
+					'#TableNameAttr'
+					],
 				DescribeEndpoints:[
 					
+					],
+				DescribeExport:[
+					'#ExportArnAttr'
 					],
 				DescribeGlobalTable:[
 					'#GlobalTableNameAttr'
@@ -231,13 +269,25 @@
 				DescribeTable:[
 					'#TableNameAttr'
 					],
+				DescribeTableReplicaAutoScaling:[
+					'#TableNameAttr'
+					],
 				DescribeTimeToLive:[
 					'#TableNameAttr'
+					],
+				ExportTableToPointInTime:[
+					'#TableArnAttr','#S3BucketAttr'
 					],
 				GetItem:[
 					'#TableNameAttr','#KeyAttr'
 					],
 				ListBackups:[
+					
+					],
+				ListContributorInsights:[
+					
+					],
+				ListExports:[
 					
 					],
 				ListGlobalTables:[
@@ -259,7 +309,7 @@
 					'#TargetTableNameAttr','#BackupArnAttr'
 					],
 				RestoreTableToPointInTime:[
-					'#SourceTableNameAttr','#TargetTableNameAttr'
+					'#TargetTableNameAttr'
 					],
 				Scan:[
 					'#TableNameAttr'
@@ -267,11 +317,20 @@
 				TagResource:[
 					'#ResourceArnAttr','#TagsAttr'
 					],
+				TransactGetItems:[
+					'#TransactItemsAttr'
+					],
+				TransactWriteItems:[
+					'#TransactItemsAttr'
+					],
 				UntagResource:[
 					'#ResourceArnAttr','#TagKeysAttr'
 					],
 				UpdateContinuousBackups:[
 					'#TableNameAttr','#PointInTimeRecoverySpecificationAttr'
+					],
+				UpdateContributorInsights:[
+					'#TableNameAttr','#ContributorInsightsActionAttr'
 					],
 				UpdateGlobalTable:[
 					'#GlobalTableNameAttr','#ReplicaUpdatesAttr'
@@ -283,6 +342,9 @@
 					'#TableNameAttr','#KeyAttr'
 					],
 				UpdateTable:[
+					'#TableNameAttr'
+					],
+				UpdateTableReplicaAutoScaling:[
 					'#TableNameAttr'
 					],
 				UpdateTimeToLive:[
@@ -316,7 +378,7 @@ NOTE: Parameters must be specified in the message, using the case specified in t
 		category: 'AWS',
 		color:"#C0DEED",
 		defaults: {
-			aws: {type:"amazon config",required:true},
+			aws: {type:"amazon", required:true},
 			operation: { value: 'BatchGetItem' },
 			
 				RequestItems: { value: ""} ,
@@ -326,16 +388,19 @@ NOTE: Parameters must be specified in the message, using the case specified in t
 				ReplicationGroup: { value: ""} ,
 				AttributeDefinitions: { value: ""} ,
 				KeySchema: { value: ""} ,
-				ProvisionedThroughput: { value: ""} ,
 				BackupArn: { value: ""} ,
 				Key: { value: ""} ,
+				ExportArn: { value: ""} ,
+				TableArn: { value: ""} ,
+				S3Bucket: { value: ""} ,
 				ResourceArn: { value: ""} ,
 				Item: { value: ""} ,
 				TargetTableName: { value: ""} ,
-				SourceTableName: { value: ""} ,
 				Tags: { value: ""} ,
+				TransactItems: { value: ""} ,
 				TagKeys: { value: ""} ,
 				PointInTimeRecoverySpecification: { value: ""} ,
+				ContributorInsightsAction: { value: ""} ,
 				ReplicaUpdates: { value: ""} ,
 				TimeToLiveSpecification: { value: ""} ,
 			name: { value: "" }

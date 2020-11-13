@@ -22,9 +22,11 @@ module.exports = function(RED) {
 		RED.nodes.createNode(this,n);
 		this.awsConfig = RED.nodes.getNode(n.aws);
 		this.region = n.region;
+		this.endpoint = n.endpoint;
 		this.operation = n.operation;
 		this.name = n.name;
 		this.region = this.awsConfig.region;
+		this.endpoint = this.awsConfig.endpoint;
 		this.accessKey = this.awsConfig.accessKey;
 		this.secretKey = this.awsConfig.secretKey;
 
@@ -45,9 +47,15 @@ module.exports = function(RED) {
             AWS.config.update({
                 httpOptions: { agent: new proxy(this.awsConfig.proxy) }
             });
-        }
+				}
+				
+		var constructor_args = { 'region': node.region, 's3ForcePathStyle': true };
 
-		var awsService = new AWS.IotData( { 'region': node.region ,'endpoint':n.endPoint} );
+		if (node.endpoint && node.endpoint !== '') {
+			constructor_args['endpoint'] = new AWS.Endpoint(node.endpoint);
+		}
+
+		var awsService = new AWS.IotData( constructor_args );
 
 		node.on("input", function(msg) {
 			node.sendMsg = function (err, data) {
@@ -102,6 +110,7 @@ module.exports = function(RED) {
 			copyArg(n,"thingName",params,undefined,false); 
 			
 			copyArg(msg,"thingName",params,undefined,false); 
+			copyArg(msg,"shadowName",params,undefined,false); 
 			
 
 			svc.deleteThingShadow(params,cb);
@@ -115,9 +124,25 @@ module.exports = function(RED) {
 			copyArg(n,"thingName",params,undefined,false); 
 			
 			copyArg(msg,"thingName",params,undefined,false); 
+			copyArg(msg,"shadowName",params,undefined,false); 
 			
 
 			svc.getThingShadow(params,cb);
+		}
+
+		
+		service.ListNamedShadowsForThing=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"thingName",params,undefined,false); 
+			
+			copyArg(msg,"thingName",params,undefined,false); 
+			copyArg(msg,"nextToken",params,undefined,false); 
+			copyArg(msg,"pageSize",params,undefined,false); 
+			
+
+			svc.listNamedShadowsForThing(params,cb);
 		}
 
 		
@@ -144,6 +169,7 @@ module.exports = function(RED) {
 			copyArg(n,"payload",params,undefined,false); 
 			
 			copyArg(msg,"thingName",params,undefined,false); 
+			copyArg(msg,"shadowName",params,undefined,false); 
 			copyArg(msg,"payload",params,undefined,false); 
 			
 

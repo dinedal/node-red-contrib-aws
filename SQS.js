@@ -22,9 +22,11 @@ module.exports = function(RED) {
 		RED.nodes.createNode(this,n);
 		this.awsConfig = RED.nodes.getNode(n.aws);
 		this.region = n.region;
+		this.endpoint = n.endpoint;
 		this.operation = n.operation;
 		this.name = n.name;
 		this.region = this.awsConfig.region;
+		this.endpoint = this.awsConfig.endpoint;
 		this.accessKey = this.awsConfig.accessKey;
 		this.secretKey = this.awsConfig.secretKey;
 
@@ -45,9 +47,15 @@ module.exports = function(RED) {
             AWS.config.update({
                 httpOptions: { agent: new proxy(this.awsConfig.proxy) }
             });
-        }
+				}
+				
+		var constructor_args = { 'region': node.region, 's3ForcePathStyle': true };
 
-		var awsService = new AWS.SQS( { 'region': node.region } );
+		if (node.endpoint && node.endpoint !== '') {
+			constructor_args['endpoint'] = new AWS.Endpoint(node.endpoint);
+		}
+
+		var awsService = new AWS.SQS( constructor_args );
 
 		node.on("input", function(msg) {
 			node.sendMsg = function (err, data) {
@@ -154,6 +162,7 @@ module.exports = function(RED) {
 			
 			copyArg(msg,"QueueName",params,undefined,false); 
 			copyArg(msg,"Attributes",params,undefined,true); 
+			copyArg(msg,"tags",params,undefined,true); 
 			
 
 			svc.createQueue(params,cb);
@@ -238,6 +247,8 @@ module.exports = function(RED) {
 			copyArg(n,"QueueUrl",params,undefined,false); 
 			
 			copyArg(msg,"QueueUrl",params,undefined,false); 
+			copyArg(msg,"NextToken",params,undefined,false); 
+			copyArg(msg,"MaxResults",params,undefined,false); 
 			
 
 			svc.listDeadLetterSourceQueues(params,cb);
@@ -263,6 +274,8 @@ module.exports = function(RED) {
 			
 			
 			copyArg(msg,"QueueNamePrefix",params,undefined,false); 
+			copyArg(msg,"NextToken",params,undefined,false); 
+			copyArg(msg,"MaxResults",params,undefined,false); 
 			
 
 			svc.listQueues(params,cb);
@@ -327,6 +340,7 @@ module.exports = function(RED) {
 			copyArg(msg,"MessageBody",params,undefined,false); 
 			copyArg(msg,"DelaySeconds",params,undefined,false); 
 			copyArg(msg,"MessageAttributes",params,undefined,true); 
+			copyArg(msg,"MessageSystemAttributes",params,undefined,true); 
 			copyArg(msg,"MessageDeduplicationId",params,undefined,false); 
 			copyArg(msg,"MessageGroupId",params,undefined,false); 
 			

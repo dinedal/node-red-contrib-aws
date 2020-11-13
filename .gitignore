@@ -3,3 +3,4 @@ npm-debug.log
 gen_scripts/build/*
 .DS_Store
 /.vs
+package-lock.json

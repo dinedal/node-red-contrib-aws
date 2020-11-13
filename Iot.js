@@ -22,9 +22,11 @@ module.exports = function(RED) {
 		RED.nodes.createNode(this,n);
 		this.awsConfig = RED.nodes.getNode(n.aws);
 		this.region = n.region;
+		this.endpoint = n.endpoint;
 		this.operation = n.operation;
 		this.name = n.name;
 		this.region = this.awsConfig.region;
+		this.endpoint = this.awsConfig.endpoint;
 		this.accessKey = this.awsConfig.accessKey;
 		this.secretKey = this.awsConfig.secretKey;
 
@@ -45,9 +47,15 @@ module.exports = function(RED) {
             AWS.config.update({
                 httpOptions: { agent: new proxy(this.awsConfig.proxy) }
             });
-        }
+				}
+				
+		var constructor_args = { 'region': node.region, 's3ForcePathStyle': true };
 
-		var awsService = new AWS.Iot( { 'region': node.region } );
+		if (node.endpoint && node.endpoint !== '') {
+			constructor_args['endpoint'] = new AWS.Endpoint(node.endpoint);
+		}
+
+		var awsService = new AWS.Iot( constructor_args );
 
 		node.on("input", function(msg) {
 			node.sendMsg = function (err, data) {
@@ -109,6 +117,21 @@ module.exports = function(RED) {
 		}
 
 		
+		service.AddThingToBillingGroup=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			
+			copyArg(msg,"billingGroupName",params,undefined,false); 
+			copyArg(msg,"billingGroupArn",params,undefined,false); 
+			copyArg(msg,"thingName",params,undefined,false); 
+			copyArg(msg,"thingArn",params,undefined,false); 
+			
+
+			svc.addThingToBillingGroup(params,cb);
+		}
+
+		
 		service.AddThingToThingGroup=function(svc,msg,cb){
 			var params={};
 			//copyArgs
@@ -118,6 +141,7 @@ module.exports = function(RED) {
 			copyArg(msg,"thingGroupArn",params,undefined,false); 
 			copyArg(msg,"thingName",params,undefined,false); 
 			copyArg(msg,"thingArn",params,undefined,false); 
+			copyArg(msg,"overrideDynamicGroups",params,undefined,false); 
 			
 
 			svc.addThingToThingGroup(params,cb);
@@ -134,6 +158,7 @@ module.exports = function(RED) {
 			copyArg(msg,"targets",params,undefined,true); 
 			copyArg(msg,"jobId",params,undefined,false); 
 			copyArg(msg,"comment",params,undefined,false); 
+			copyArg(msg,"namespaceId",params,undefined,false); 
 			
 
 			svc.associateTargetsWithJob(params,cb);
@@ -200,6 +225,19 @@ module.exports = function(RED) {
 		}
 
 		
+		service.CancelAuditMitigationActionsTask=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"taskId",params,undefined,false); 
+			
+			copyArg(msg,"taskId",params,undefined,false); 
+			
+
+			svc.cancelAuditMitigationActionsTask(params,cb);
+		}
+
+		
 		service.CancelAuditTask=function(svc,msg,cb){
 			var params={};
 			//copyArgs
@@ -233,6 +271,7 @@ module.exports = function(RED) {
 			copyArg(n,"jobId",params,undefined,false); 
 			
 			copyArg(msg,"jobId",params,undefined,false); 
+			copyArg(msg,"reasonCode",params,undefined,false); 
 			copyArg(msg,"comment",params,undefined,false); 
 			copyArg(msg,"force",params,undefined,false); 
 			
@@ -270,23 +309,71 @@ module.exports = function(RED) {
 		}
 
 		
+		service.ConfirmTopicRuleDestination=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"confirmationToken",params,undefined,false); 
+			
+			copyArg(msg,"confirmationToken",params,undefined,false); 
+			
+
+			svc.confirmTopicRuleDestination(params,cb);
+		}
+
+		
+		service.CreateAuditSuppression=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"checkName",params,undefined,false); 
+			copyArg(n,"resourceIdentifier",params,undefined,true); 
+			copyArg(n,"clientRequestToken",params,undefined,false); 
+			
+			copyArg(msg,"checkName",params,undefined,false); 
+			copyArg(msg,"resourceIdentifier",params,undefined,true); 
+			copyArg(msg,"expirationDate",params,undefined,false); 
+			copyArg(msg,"suppressIndefinitely",params,undefined,false); 
+			copyArg(msg,"description",params,undefined,false); 
+			copyArg(msg,"clientRequestToken",params,undefined,false); 
+			
+
+			svc.createAuditSuppression(params,cb);
+		}
+
+		
 		service.CreateAuthorizer=function(svc,msg,cb){
 			var params={};
 			//copyArgs
 			
 			copyArg(n,"authorizerName",params,undefined,false); 
 			copyArg(n,"authorizerFunctionArn",params,undefined,false); 
-			copyArg(n,"tokenKeyName",params,undefined,false); 
-			copyArg(n,"tokenSigningPublicKeys",params,undefined,true); 
 			
 			copyArg(msg,"authorizerName",params,undefined,false); 
 			copyArg(msg,"authorizerFunctionArn",params,undefined,false); 
 			copyArg(msg,"tokenKeyName",params,undefined,false); 
 			copyArg(msg,"tokenSigningPublicKeys",params,undefined,true); 
 			copyArg(msg,"status",params,undefined,false); 
+			copyArg(msg,"tags",params,undefined,true); 
+			copyArg(msg,"signingDisabled",params,undefined,false); 
 			
 
 			svc.createAuthorizer(params,cb);
+		}
+
+		
+		service.CreateBillingGroup=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"billingGroupName",params,undefined,false); 
+			
+			copyArg(msg,"billingGroupName",params,undefined,false); 
+			copyArg(msg,"billingGroupProperties",params,undefined,true); 
+			copyArg(msg,"tags",params,undefined,true); 
+			
+
+			svc.createBillingGroup(params,cb);
 		}
 
 		
@@ -301,6 +388,64 @@ module.exports = function(RED) {
 			
 
 			svc.createCertificateFromCsr(params,cb);
+		}
+
+		
+		service.CreateDimension=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"name",params,undefined,false); 
+			copyArg(n,"type",params,undefined,false); 
+			copyArg(n,"stringValues",params,undefined,true); 
+			copyArg(n,"clientRequestToken",params,undefined,false); 
+			
+			copyArg(msg,"name",params,undefined,false); 
+			copyArg(msg,"type",params,undefined,false); 
+			copyArg(msg,"stringValues",params,undefined,true); 
+			copyArg(msg,"tags",params,undefined,true); 
+			copyArg(msg,"clientRequestToken",params,undefined,false); 
+			
+
+			svc.createDimension(params,cb);
+		}
+
+		
+		service.CreateDomainConfiguration=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"domainConfigurationName",params,undefined,false); 
+			
+			copyArg(msg,"domainConfigurationName",params,undefined,false); 
+			copyArg(msg,"domainName",params,undefined,false); 
+			copyArg(msg,"serverCertificateArns",params,undefined,false); 
+			copyArg(msg,"validationCertificateArn",params,undefined,false); 
+			copyArg(msg,"authorizerConfig",params,undefined,true); 
+			copyArg(msg,"serviceType",params,undefined,false); 
+			copyArg(msg,"tags",params,undefined,true); 
+			
+
+			svc.createDomainConfiguration(params,cb);
+		}
+
+		
+		service.CreateDynamicThingGroup=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"thingGroupName",params,undefined,false); 
+			copyArg(n,"queryString",params,undefined,false); 
+			
+			copyArg(msg,"thingGroupName",params,undefined,false); 
+			copyArg(msg,"thingGroupProperties",params,undefined,true); 
+			copyArg(msg,"indexName",params,undefined,false); 
+			copyArg(msg,"queryString",params,undefined,false); 
+			copyArg(msg,"queryVersion",params,undefined,false); 
+			copyArg(msg,"tags",params,undefined,true); 
+			
+
+			svc.createDynamicThingGroup(params,cb);
 		}
 
 		
@@ -319,7 +464,10 @@ module.exports = function(RED) {
 			copyArg(msg,"presignedUrlConfig",params,undefined,true); 
 			copyArg(msg,"targetSelection",params,undefined,false); 
 			copyArg(msg,"jobExecutionsRolloutConfig",params,undefined,true); 
+			copyArg(msg,"abortConfig",params,undefined,true); 
 			copyArg(msg,"timeoutConfig",params,undefined,true); 
+			copyArg(msg,"tags",params,undefined,true); 
+			copyArg(msg,"namespaceId",params,undefined,false); 
 			
 
 			svc.createJob(params,cb);
@@ -338,6 +486,24 @@ module.exports = function(RED) {
 		}
 
 		
+		service.CreateMitigationAction=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"actionName",params,undefined,false); 
+			copyArg(n,"roleArn",params,undefined,false); 
+			copyArg(n,"actionParams",params,undefined,true); 
+			
+			copyArg(msg,"actionName",params,undefined,false); 
+			copyArg(msg,"roleArn",params,undefined,false); 
+			copyArg(msg,"actionParams",params,undefined,true); 
+			copyArg(msg,"tags",params,undefined,true); 
+			
+
+			svc.createMitigationAction(params,cb);
+		}
+
+		
 		service.CreateOTAUpdate=function(svc,msg,cb){
 			var params={};
 			//copyArgs
@@ -350,11 +516,16 @@ module.exports = function(RED) {
 			copyArg(msg,"otaUpdateId",params,undefined,false); 
 			copyArg(msg,"description",params,undefined,false); 
 			copyArg(msg,"targets",params,undefined,true); 
+			copyArg(msg,"protocols",params,undefined,true); 
 			copyArg(msg,"targetSelection",params,undefined,false); 
 			copyArg(msg,"awsJobExecutionsRolloutConfig",params,undefined,true); 
+			copyArg(msg,"awsJobPresignedUrlConfig",params,undefined,true); 
+			copyArg(msg,"awsJobAbortConfig",params,undefined,false); 
+			copyArg(msg,"awsJobTimeoutConfig",params,undefined,false); 
 			copyArg(msg,"files",params,undefined,true); 
 			copyArg(msg,"roleArn",params,undefined,false); 
 			copyArg(msg,"additionalParameters",params,undefined,true); 
+			copyArg(msg,"tags",params,undefined,true); 
 			
 
 			svc.createOTAUpdate(params,cb);
@@ -370,6 +541,7 @@ module.exports = function(RED) {
 			
 			copyArg(msg,"policyName",params,undefined,false); 
 			copyArg(msg,"policyDocument",params,undefined,false); 
+			copyArg(msg,"tags",params,undefined,true); 
 			
 
 			svc.createPolicy(params,cb);
@@ -392,6 +564,56 @@ module.exports = function(RED) {
 		}
 
 		
+		service.CreateProvisioningClaim=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"templateName",params,undefined,false); 
+			
+			copyArg(msg,"templateName",params,undefined,false); 
+			
+
+			svc.createProvisioningClaim(params,cb);
+		}
+
+		
+		service.CreateProvisioningTemplate=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"templateName",params,undefined,false); 
+			copyArg(n,"templateBody",params,undefined,false); 
+			copyArg(n,"provisioningRoleArn",params,undefined,false); 
+			
+			copyArg(msg,"templateName",params,undefined,false); 
+			copyArg(msg,"description",params,undefined,false); 
+			copyArg(msg,"templateBody",params,undefined,false); 
+			copyArg(msg,"enabled",params,undefined,false); 
+			copyArg(msg,"provisioningRoleArn",params,undefined,false); 
+			copyArg(msg,"preProvisioningHook",params,undefined,true); 
+			copyArg(msg,"tags",params,undefined,true); 
+			
+
+			svc.createProvisioningTemplate(params,cb);
+		}
+
+		
+		service.CreateProvisioningTemplateVersion=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"templateName",params,undefined,false); 
+			copyArg(n,"templateBody",params,undefined,false); 
+			
+			copyArg(msg,"templateName",params,undefined,false); 
+			copyArg(msg,"templateBody",params,undefined,false); 
+			copyArg(msg,"setAsDefault",params,undefined,false); 
+			
+
+			svc.createProvisioningTemplateVersion(params,cb);
+		}
+
+		
 		service.CreateRoleAlias=function(svc,msg,cb){
 			var params={};
 			//copyArgs
@@ -402,6 +624,7 @@ module.exports = function(RED) {
 			copyArg(msg,"roleAlias",params,undefined,false); 
 			copyArg(msg,"roleArn",params,undefined,false); 
 			copyArg(msg,"credentialDurationSeconds",params,undefined,false); 
+			copyArg(msg,"tags",params,undefined,true); 
 			
 
 			svc.createRoleAlias(params,cb);
@@ -421,6 +644,7 @@ module.exports = function(RED) {
 			copyArg(msg,"dayOfWeek",params,undefined,false); 
 			copyArg(msg,"targetCheckNames",params,undefined,true); 
 			copyArg(msg,"scheduledAuditName",params,undefined,false); 
+			copyArg(msg,"tags",params,undefined,true); 
 			
 
 			svc.createScheduledAudit(params,cb);
@@ -432,12 +656,14 @@ module.exports = function(RED) {
 			//copyArgs
 			
 			copyArg(n,"securityProfileName",params,undefined,false); 
-			copyArg(n,"behaviors",params,undefined,true); 
 			
 			copyArg(msg,"securityProfileName",params,undefined,false); 
 			copyArg(msg,"securityProfileDescription",params,undefined,false); 
 			copyArg(msg,"behaviors",params,undefined,true); 
 			copyArg(msg,"alertTargets",params,undefined,true); 
+			copyArg(msg,"additionalMetricsToRetain",params,undefined,true); 
+			copyArg(msg,"additionalMetricsToRetainV2",params,undefined,true); 
+			copyArg(msg,"tags",params,undefined,true); 
 			
 
 			svc.createSecurityProfile(params,cb);
@@ -456,6 +682,7 @@ module.exports = function(RED) {
 			copyArg(msg,"description",params,undefined,false); 
 			copyArg(msg,"files",params,undefined,true); 
 			copyArg(msg,"roleArn",params,undefined,false); 
+			copyArg(msg,"tags",params,undefined,true); 
 			
 
 			svc.createStream(params,cb);
@@ -471,6 +698,7 @@ module.exports = function(RED) {
 			copyArg(msg,"thingName",params,undefined,false); 
 			copyArg(msg,"thingTypeName",params,undefined,false); 
 			copyArg(msg,"attributePayload",params,undefined,true); 
+			copyArg(msg,"billingGroupName",params,undefined,false); 
 			
 
 			svc.createThing(params,cb);
@@ -486,6 +714,7 @@ module.exports = function(RED) {
 			copyArg(msg,"thingGroupName",params,undefined,false); 
 			copyArg(msg,"parentGroupName",params,undefined,false); 
 			copyArg(msg,"thingGroupProperties",params,undefined,true); 
+			copyArg(msg,"tags",params,undefined,true); 
 			
 
 			svc.createThingGroup(params,cb);
@@ -500,6 +729,7 @@ module.exports = function(RED) {
 			
 			copyArg(msg,"thingTypeName",params,undefined,false); 
 			copyArg(msg,"thingTypeProperties",params,undefined,true); 
+			copyArg(msg,"tags",params,undefined,true); 
 			
 
 			svc.createThingType(params,cb);
@@ -515,9 +745,23 @@ module.exports = function(RED) {
 			
 			copyArg(msg,"ruleName",params,undefined,false); 
 			copyArg(msg,"topicRulePayload",params,undefined,true); 
+			copyArg(msg,"tags",params,undefined,false); 
 			
 
 			svc.createTopicRule(params,cb);
+		}
+
+		
+		service.CreateTopicRuleDestination=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"destinationConfiguration",params,undefined,false); 
+			
+			copyArg(msg,"destinationConfiguration",params,undefined,false); 
+			
+
+			svc.createTopicRuleDestination(params,cb);
 		}
 
 		
@@ -533,6 +777,21 @@ module.exports = function(RED) {
 		}
 
 		
+		service.DeleteAuditSuppression=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"checkName",params,undefined,false); 
+			copyArg(n,"resourceIdentifier",params,undefined,true); 
+			
+			copyArg(msg,"checkName",params,undefined,false); 
+			copyArg(msg,"resourceIdentifier",params,undefined,true); 
+			
+
+			svc.deleteAuditSuppression(params,cb);
+		}
+
+		
 		service.DeleteAuthorizer=function(svc,msg,cb){
 			var params={};
 			//copyArgs
@@ -543,6 +802,20 @@ module.exports = function(RED) {
 			
 
 			svc.deleteAuthorizer(params,cb);
+		}
+
+		
+		service.DeleteBillingGroup=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"billingGroupName",params,undefined,false); 
+			
+			copyArg(msg,"billingGroupName",params,undefined,false); 
+			copyArg(msg,"expectedVersion",params,undefined,false); 
+			
+
+			svc.deleteBillingGroup(params,cb);
 		}
 
 		
@@ -573,6 +846,46 @@ module.exports = function(RED) {
 		}
 
 		
+		service.DeleteDimension=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"name",params,undefined,false); 
+			
+			copyArg(msg,"name",params,undefined,false); 
+			
+
+			svc.deleteDimension(params,cb);
+		}
+
+		
+		service.DeleteDomainConfiguration=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"domainConfigurationName",params,undefined,false); 
+			
+			copyArg(msg,"domainConfigurationName",params,undefined,false); 
+			
+
+			svc.deleteDomainConfiguration(params,cb);
+		}
+
+		
+		service.DeleteDynamicThingGroup=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"thingGroupName",params,undefined,false); 
+			
+			copyArg(msg,"thingGroupName",params,undefined,false); 
+			copyArg(msg,"expectedVersion",params,undefined,false); 
+			
+
+			svc.deleteDynamicThingGroup(params,cb);
+		}
+
+		
 		service.DeleteJob=function(svc,msg,cb){
 			var params={};
 			//copyArgs
@@ -581,6 +894,7 @@ module.exports = function(RED) {
 			
 			copyArg(msg,"jobId",params,undefined,false); 
 			copyArg(msg,"force",params,undefined,false); 
+			copyArg(msg,"namespaceId",params,undefined,false); 
 			
 
 			svc.deleteJob(params,cb);
@@ -599,9 +913,23 @@ module.exports = function(RED) {
 			copyArg(msg,"thingName",params,undefined,false); 
 			copyArg(msg,"executionNumber",params,undefined,false); 
 			copyArg(msg,"force",params,undefined,false); 
+			copyArg(msg,"namespaceId",params,undefined,false); 
 			
 
 			svc.deleteJobExecution(params,cb);
+		}
+
+		
+		service.DeleteMitigationAction=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"actionName",params,undefined,false); 
+			
+			copyArg(msg,"actionName",params,undefined,false); 
+			
+
+			svc.deleteMitigationAction(params,cb);
 		}
 
 		
@@ -645,6 +973,34 @@ module.exports = function(RED) {
 			
 
 			svc.deletePolicyVersion(params,cb);
+		}
+
+		
+		service.DeleteProvisioningTemplate=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"templateName",params,undefined,false); 
+			
+			copyArg(msg,"templateName",params,undefined,false); 
+			
+
+			svc.deleteProvisioningTemplate(params,cb);
+		}
+
+		
+		service.DeleteProvisioningTemplateVersion=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"templateName",params,undefined,false); 
+			copyArg(n,"versionId",params,undefined,false); 
+			
+			copyArg(msg,"templateName",params,undefined,false); 
+			copyArg(msg,"versionId",params,undefined,false); 
+			
+
+			svc.deleteProvisioningTemplateVersion(params,cb);
 		}
 
 		
@@ -766,6 +1122,19 @@ module.exports = function(RED) {
 		}
 
 		
+		service.DeleteTopicRuleDestination=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"arn",params,undefined,false); 
+			
+			copyArg(msg,"arn",params,undefined,false); 
+			
+
+			svc.deleteTopicRuleDestination(params,cb);
+		}
+
+		
 		service.DeleteV2LoggingLevel=function(svc,msg,cb){
 			var params={};
 			//copyArgs
@@ -806,6 +1175,47 @@ module.exports = function(RED) {
 		}
 
 		
+		service.DescribeAuditFinding=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"findingId",params,undefined,false); 
+			
+			copyArg(msg,"findingId",params,undefined,false); 
+			
+
+			svc.describeAuditFinding(params,cb);
+		}
+
+		
+		service.DescribeAuditMitigationActionsTask=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"taskId",params,undefined,false); 
+			
+			copyArg(msg,"taskId",params,undefined,false); 
+			
+
+			svc.describeAuditMitigationActionsTask(params,cb);
+		}
+
+		
+		service.DescribeAuditSuppression=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"checkName",params,undefined,false); 
+			copyArg(n,"resourceIdentifier",params,undefined,true); 
+			
+			copyArg(msg,"checkName",params,undefined,false); 
+			copyArg(msg,"resourceIdentifier",params,undefined,true); 
+			
+
+			svc.describeAuditSuppression(params,cb);
+		}
+
+		
 		service.DescribeAuditTask=function(svc,msg,cb){
 			var params={};
 			//copyArgs
@@ -829,6 +1239,19 @@ module.exports = function(RED) {
 			
 
 			svc.describeAuthorizer(params,cb);
+		}
+
+		
+		service.DescribeBillingGroup=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"billingGroupName",params,undefined,false); 
+			
+			copyArg(msg,"billingGroupName",params,undefined,false); 
+			
+
+			svc.describeBillingGroup(params,cb);
 		}
 
 		
@@ -866,6 +1289,32 @@ module.exports = function(RED) {
 			
 
 			svc.describeDefaultAuthorizer(params,cb);
+		}
+
+		
+		service.DescribeDimension=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"name",params,undefined,false); 
+			
+			copyArg(msg,"name",params,undefined,false); 
+			
+
+			svc.describeDimension(params,cb);
+		}
+
+		
+		service.DescribeDomainConfiguration=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"domainConfigurationName",params,undefined,false); 
+			
+			copyArg(msg,"domainConfigurationName",params,undefined,false); 
+			
+
+			svc.describeDomainConfiguration(params,cb);
 		}
 
 		
@@ -931,6 +1380,47 @@ module.exports = function(RED) {
 			
 
 			svc.describeJobExecution(params,cb);
+		}
+
+		
+		service.DescribeMitigationAction=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"actionName",params,undefined,false); 
+			
+			copyArg(msg,"actionName",params,undefined,false); 
+			
+
+			svc.describeMitigationAction(params,cb);
+		}
+
+		
+		service.DescribeProvisioningTemplate=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"templateName",params,undefined,false); 
+			
+			copyArg(msg,"templateName",params,undefined,false); 
+			
+
+			svc.describeProvisioningTemplate(params,cb);
+		}
+
+		
+		service.DescribeProvisioningTemplateVersion=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"templateName",params,undefined,false); 
+			copyArg(n,"versionId",params,undefined,false); 
+			
+			copyArg(msg,"templateName",params,undefined,false); 
+			copyArg(msg,"versionId",params,undefined,false); 
+			
+
+			svc.describeProvisioningTemplateVersion(params,cb);
 		}
 
 		
@@ -1124,6 +1614,22 @@ module.exports = function(RED) {
 		}
 
 		
+		service.GetCardinality=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"queryString",params,undefined,false); 
+			
+			copyArg(msg,"indexName",params,undefined,false); 
+			copyArg(msg,"queryString",params,undefined,false); 
+			copyArg(msg,"aggregationField",params,undefined,false); 
+			copyArg(msg,"queryVersion",params,undefined,false); 
+			
+
+			svc.getCardinality(params,cb);
+		}
+
+		
 		service.GetEffectivePolicies=function(svc,msg,cb){
 			var params={};
 			//copyArgs
@@ -1186,6 +1692,23 @@ module.exports = function(RED) {
 		}
 
 		
+		service.GetPercentiles=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"queryString",params,undefined,false); 
+			
+			copyArg(msg,"indexName",params,undefined,false); 
+			copyArg(msg,"queryString",params,undefined,false); 
+			copyArg(msg,"aggregationField",params,undefined,false); 
+			copyArg(msg,"queryVersion",params,undefined,false); 
+			copyArg(msg,"percents",params,undefined,false); 
+			
+
+			svc.getPercentiles(params,cb);
+		}
+
+		
 		service.GetPolicy=function(svc,msg,cb){
 			var params={};
 			//copyArgs
@@ -1225,6 +1748,22 @@ module.exports = function(RED) {
 		}
 
 		
+		service.GetStatistics=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"queryString",params,undefined,false); 
+			
+			copyArg(msg,"indexName",params,undefined,false); 
+			copyArg(msg,"queryString",params,undefined,false); 
+			copyArg(msg,"aggregationField",params,undefined,false); 
+			copyArg(msg,"queryVersion",params,undefined,false); 
+			
+
+			svc.getStatistics(params,cb);
+		}
+
+		
 		service.GetTopicRule=function(svc,msg,cb){
 			var params={};
 			//copyArgs
@@ -1235,6 +1774,19 @@ module.exports = function(RED) {
 			
 
 			svc.getTopicRule(params,cb);
+		}
+
+		
+		service.GetTopicRuleDestination=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"arn",params,undefined,false); 
+			
+			copyArg(msg,"arn",params,undefined,false); 
+			
+
+			svc.getTopicRuleDestination(params,cb);
 		}
 
 		
@@ -1292,9 +1844,64 @@ module.exports = function(RED) {
 			copyArg(msg,"nextToken",params,undefined,false); 
 			copyArg(msg,"startTime",params,undefined,false); 
 			copyArg(msg,"endTime",params,undefined,false); 
+			copyArg(msg,"listSuppressedFindings",params,undefined,false); 
 			
 
 			svc.listAuditFindings(params,cb);
+		}
+
+		
+		service.ListAuditMitigationActionsExecutions=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"taskId",params,undefined,false); 
+			copyArg(n,"findingId",params,undefined,false); 
+			
+			copyArg(msg,"taskId",params,undefined,false); 
+			copyArg(msg,"actionStatus",params,undefined,false); 
+			copyArg(msg,"findingId",params,undefined,false); 
+			copyArg(msg,"maxResults",params,undefined,false); 
+			copyArg(msg,"nextToken",params,undefined,false); 
+			
+
+			svc.listAuditMitigationActionsExecutions(params,cb);
+		}
+
+		
+		service.ListAuditMitigationActionsTasks=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"startTime",params,undefined,false); 
+			copyArg(n,"endTime",params,undefined,false); 
+			
+			copyArg(msg,"auditTaskId",params,undefined,false); 
+			copyArg(msg,"findingId",params,undefined,false); 
+			copyArg(msg,"taskStatus",params,undefined,false); 
+			copyArg(msg,"maxResults",params,undefined,false); 
+			copyArg(msg,"nextToken",params,undefined,false); 
+			copyArg(msg,"startTime",params,undefined,false); 
+			copyArg(msg,"endTime",params,undefined,false); 
+			
+
+			svc.listAuditMitigationActionsTasks(params,cb);
+		}
+
+		
+		service.ListAuditSuppressions=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			
+			copyArg(msg,"checkName",params,undefined,false); 
+			copyArg(msg,"resourceIdentifier",params,undefined,true); 
+			copyArg(msg,"ascendingOrder",params,undefined,false); 
+			copyArg(msg,"nextToken",params,undefined,false); 
+			copyArg(msg,"maxResults",params,undefined,false); 
+			
+
+			svc.listAuditSuppressions(params,cb);
 		}
 
 		
@@ -1329,6 +1936,20 @@ module.exports = function(RED) {
 			
 
 			svc.listAuthorizers(params,cb);
+		}
+
+		
+		service.ListBillingGroups=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			
+			copyArg(msg,"nextToken",params,undefined,false); 
+			copyArg(msg,"maxResults",params,undefined,false); 
+			copyArg(msg,"namePrefixFilter",params,undefined,false); 
+			
+
+			svc.listBillingGroups(params,cb);
 		}
 
 		
@@ -1376,6 +1997,33 @@ module.exports = function(RED) {
 		}
 
 		
+		service.ListDimensions=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			
+			copyArg(msg,"nextToken",params,undefined,false); 
+			copyArg(msg,"maxResults",params,undefined,false); 
+			
+
+			svc.listDimensions(params,cb);
+		}
+
+		
+		service.ListDomainConfigurations=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			
+			copyArg(msg,"marker",params,undefined,false); 
+			copyArg(msg,"pageSize",params,undefined,false); 
+			copyArg(msg,"serviceType",params,undefined,false); 
+			
+
+			svc.listDomainConfigurations(params,cb);
+		}
+
+		
 		service.ListIndices=function(svc,msg,cb){
 			var params={};
 			//copyArgs
@@ -1413,6 +2061,7 @@ module.exports = function(RED) {
 			
 			copyArg(msg,"thingName",params,undefined,false); 
 			copyArg(msg,"status",params,undefined,false); 
+			copyArg(msg,"namespaceId",params,undefined,false); 
 			copyArg(msg,"maxResults",params,undefined,false); 
 			copyArg(msg,"nextToken",params,undefined,false); 
 			
@@ -1432,9 +2081,24 @@ module.exports = function(RED) {
 			copyArg(msg,"nextToken",params,undefined,false); 
 			copyArg(msg,"thingGroupName",params,undefined,false); 
 			copyArg(msg,"thingGroupId",params,undefined,false); 
+			copyArg(msg,"namespaceId",params,undefined,false); 
 			
 
 			svc.listJobs(params,cb);
+		}
+
+		
+		service.ListMitigationActions=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			
+			copyArg(msg,"actionType",params,undefined,false); 
+			copyArg(msg,"maxResults",params,undefined,false); 
+			copyArg(msg,"nextToken",params,undefined,false); 
+			
+
+			svc.listMitigationActions(params,cb);
 		}
 
 		
@@ -1540,6 +2204,34 @@ module.exports = function(RED) {
 		}
 
 		
+		service.ListProvisioningTemplateVersions=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"templateName",params,undefined,false); 
+			
+			copyArg(msg,"templateName",params,undefined,false); 
+			copyArg(msg,"maxResults",params,undefined,false); 
+			copyArg(msg,"nextToken",params,undefined,false); 
+			
+
+			svc.listProvisioningTemplateVersions(params,cb);
+		}
+
+		
+		service.ListProvisioningTemplates=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			
+			copyArg(msg,"maxResults",params,undefined,false); 
+			copyArg(msg,"nextToken",params,undefined,false); 
+			
+
+			svc.listProvisioningTemplates(params,cb);
+		}
+
+		
 		service.ListRoleAliases=function(svc,msg,cb){
 			var params={};
 			//copyArgs
@@ -1574,6 +2266,7 @@ module.exports = function(RED) {
 			
 			copyArg(msg,"nextToken",params,undefined,false); 
 			copyArg(msg,"maxResults",params,undefined,false); 
+			copyArg(msg,"dimensionName",params,undefined,false); 
 			
 
 			svc.listSecurityProfiles(params,cb);
@@ -1607,6 +2300,20 @@ module.exports = function(RED) {
 			
 
 			svc.listStreams(params,cb);
+		}
+
+		
+		service.ListTagsForResource=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"resourceArn",params,undefined,false); 
+			
+			copyArg(msg,"resourceArn",params,undefined,false); 
+			copyArg(msg,"nextToken",params,undefined,false); 
+			
+
+			svc.listTagsForResource(params,cb);
 		}
 
 		
@@ -1677,6 +2384,8 @@ module.exports = function(RED) {
 			
 			copyArg(n,"thingName",params,undefined,false); 
 			
+			copyArg(msg,"nextToken",params,undefined,false); 
+			copyArg(msg,"maxResults",params,undefined,false); 
 			copyArg(msg,"thingName",params,undefined,false); 
 			
 
@@ -1745,6 +2454,21 @@ module.exports = function(RED) {
 		}
 
 		
+		service.ListThingsInBillingGroup=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"billingGroupName",params,undefined,false); 
+			
+			copyArg(msg,"billingGroupName",params,undefined,false); 
+			copyArg(msg,"nextToken",params,undefined,false); 
+			copyArg(msg,"maxResults",params,undefined,false); 
+			
+
+			svc.listThingsInBillingGroup(params,cb);
+		}
+
+		
 		service.ListThingsInThingGroup=function(svc,msg,cb){
 			var params={};
 			//copyArgs
@@ -1758,6 +2482,19 @@ module.exports = function(RED) {
 			
 
 			svc.listThingsInThingGroup(params,cb);
+		}
+
+		
+		service.ListTopicRuleDestinations=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			
+			copyArg(msg,"maxResults",params,undefined,false); 
+			copyArg(msg,"nextToken",params,undefined,false); 
+			
+
+			svc.listTopicRuleDestinations(params,cb);
 		}
 
 		
@@ -1821,6 +2558,7 @@ module.exports = function(RED) {
 			copyArg(msg,"setAsActive",params,undefined,false); 
 			copyArg(msg,"allowAutoRegistration",params,undefined,false); 
 			copyArg(msg,"registrationConfig",params,undefined,true); 
+			copyArg(msg,"tags",params,undefined,true); 
 			
 
 			svc.registerCACertificate(params,cb);
@@ -1840,6 +2578,20 @@ module.exports = function(RED) {
 			
 
 			svc.registerCertificate(params,cb);
+		}
+
+		
+		service.RegisterCertificateWithoutCA=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"certificatePem",params,undefined,false); 
+			
+			copyArg(msg,"certificatePem",params,undefined,false); 
+			copyArg(msg,"status",params,undefined,false); 
+			
+
+			svc.registerCertificateWithoutCA(params,cb);
 		}
 
 		
@@ -1868,6 +2620,21 @@ module.exports = function(RED) {
 			
 
 			svc.rejectCertificateTransfer(params,cb);
+		}
+
+		
+		service.RemoveThingFromBillingGroup=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			
+			copyArg(msg,"billingGroupName",params,undefined,false); 
+			copyArg(msg,"billingGroupArn",params,undefined,false); 
+			copyArg(msg,"thingName",params,undefined,false); 
+			copyArg(msg,"thingArn",params,undefined,false); 
+			
+
+			svc.removeThingFromBillingGroup(params,cb);
 		}
 
 		
@@ -1988,6 +2755,25 @@ module.exports = function(RED) {
 		}
 
 		
+		service.StartAuditMitigationActionsTask=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"taskId",params,undefined,false); 
+			copyArg(n,"target",params,undefined,true); 
+			copyArg(n,"auditCheckToActionsMapping",params,undefined,true); 
+			copyArg(n,"clientRequestToken",params,undefined,false); 
+			
+			copyArg(msg,"taskId",params,undefined,false); 
+			copyArg(msg,"target",params,undefined,true); 
+			copyArg(msg,"auditCheckToActionsMapping",params,undefined,true); 
+			copyArg(msg,"clientRequestToken",params,undefined,false); 
+			
+
+			svc.startAuditMitigationActionsTask(params,cb);
+		}
+
+		
 		service.StartOnDemandAuditTask=function(svc,msg,cb){
 			var params={};
 			//copyArgs
@@ -2033,6 +2819,21 @@ module.exports = function(RED) {
 		}
 
 		
+		service.TagResource=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"resourceArn",params,undefined,false); 
+			copyArg(n,"tags",params,undefined,true); 
+			
+			copyArg(msg,"resourceArn",params,undefined,false); 
+			copyArg(msg,"tags",params,undefined,true); 
+			
+
+			svc.tagResource(params,cb);
+		}
+
+		
 		service.TestAuthorization=function(svc,msg,cb){
 			var params={};
 			//copyArgs
@@ -2056,12 +2857,13 @@ module.exports = function(RED) {
 			//copyArgs
 			
 			copyArg(n,"authorizerName",params,undefined,false); 
-			copyArg(n,"token",params,undefined,false); 
-			copyArg(n,"tokenSignature",params,undefined,false); 
 			
 			copyArg(msg,"authorizerName",params,undefined,false); 
 			copyArg(msg,"token",params,undefined,false); 
 			copyArg(msg,"tokenSignature",params,undefined,false); 
+			copyArg(msg,"httpContext",params,undefined,false); 
+			copyArg(msg,"mqttContext",params,undefined,false); 
+			copyArg(msg,"tlsContext",params,undefined,false); 
 			
 
 			svc.testInvokeAuthorizer(params,cb);
@@ -2084,6 +2886,21 @@ module.exports = function(RED) {
 		}
 
 		
+		service.UntagResource=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"resourceArn",params,undefined,false); 
+			copyArg(n,"tagKeys",params,undefined,false); 
+			
+			copyArg(msg,"resourceArn",params,undefined,false); 
+			copyArg(msg,"tagKeys",params,undefined,false); 
+			
+
+			svc.untagResource(params,cb);
+		}
+
+		
 		service.UpdateAccountAuditConfiguration=function(svc,msg,cb){
 			var params={};
 			//copyArgs
@@ -2095,6 +2912,24 @@ module.exports = function(RED) {
 			
 
 			svc.updateAccountAuditConfiguration(params,cb);
+		}
+
+		
+		service.UpdateAuditSuppression=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"checkName",params,undefined,false); 
+			copyArg(n,"resourceIdentifier",params,undefined,true); 
+			
+			copyArg(msg,"checkName",params,undefined,false); 
+			copyArg(msg,"resourceIdentifier",params,undefined,true); 
+			copyArg(msg,"expirationDate",params,undefined,false); 
+			copyArg(msg,"suppressIndefinitely",params,undefined,false); 
+			copyArg(msg,"description",params,undefined,false); 
+			
+
+			svc.updateAuditSuppression(params,cb);
 		}
 
 		
@@ -2112,6 +2947,22 @@ module.exports = function(RED) {
 			
 
 			svc.updateAuthorizer(params,cb);
+		}
+
+		
+		service.UpdateBillingGroup=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"billingGroupName",params,undefined,false); 
+			copyArg(n,"billingGroupProperties",params,undefined,true); 
+			
+			copyArg(msg,"billingGroupName",params,undefined,false); 
+			copyArg(msg,"billingGroupProperties",params,undefined,true); 
+			copyArg(msg,"expectedVersion",params,undefined,false); 
+			
+
+			svc.updateBillingGroup(params,cb);
 		}
 
 		
@@ -2147,6 +2998,56 @@ module.exports = function(RED) {
 		}
 
 		
+		service.UpdateDimension=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"name",params,undefined,false); 
+			copyArg(n,"stringValues",params,undefined,true); 
+			
+			copyArg(msg,"name",params,undefined,false); 
+			copyArg(msg,"stringValues",params,undefined,true); 
+			
+
+			svc.updateDimension(params,cb);
+		}
+
+		
+		service.UpdateDomainConfiguration=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"domainConfigurationName",params,undefined,false); 
+			
+			copyArg(msg,"domainConfigurationName",params,undefined,false); 
+			copyArg(msg,"authorizerConfig",params,undefined,true); 
+			copyArg(msg,"domainConfigurationStatus",params,undefined,false); 
+			copyArg(msg,"removeAuthorizerConfig",params,undefined,false); 
+			
+
+			svc.updateDomainConfiguration(params,cb);
+		}
+
+		
+		service.UpdateDynamicThingGroup=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"thingGroupName",params,undefined,false); 
+			copyArg(n,"thingGroupProperties",params,undefined,true); 
+			
+			copyArg(msg,"thingGroupName",params,undefined,false); 
+			copyArg(msg,"thingGroupProperties",params,undefined,true); 
+			copyArg(msg,"expectedVersion",params,undefined,false); 
+			copyArg(msg,"indexName",params,undefined,false); 
+			copyArg(msg,"queryString",params,undefined,false); 
+			copyArg(msg,"queryVersion",params,undefined,false); 
+			
+
+			svc.updateDynamicThingGroup(params,cb);
+		}
+
+		
 		service.UpdateEventConfigurations=function(svc,msg,cb){
 			var params={};
 			//copyArgs
@@ -2169,6 +3070,59 @@ module.exports = function(RED) {
 			
 
 			svc.updateIndexingConfiguration(params,cb);
+		}
+
+		
+		service.UpdateJob=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"jobId",params,undefined,false); 
+			
+			copyArg(msg,"jobId",params,undefined,false); 
+			copyArg(msg,"description",params,undefined,false); 
+			copyArg(msg,"presignedUrlConfig",params,undefined,true); 
+			copyArg(msg,"jobExecutionsRolloutConfig",params,undefined,true); 
+			copyArg(msg,"abortConfig",params,undefined,true); 
+			copyArg(msg,"timeoutConfig",params,undefined,true); 
+			copyArg(msg,"namespaceId",params,undefined,false); 
+			
+
+			svc.updateJob(params,cb);
+		}
+
+		
+		service.UpdateMitigationAction=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"actionName",params,undefined,false); 
+			
+			copyArg(msg,"actionName",params,undefined,false); 
+			copyArg(msg,"roleArn",params,undefined,false); 
+			copyArg(msg,"actionParams",params,undefined,true); 
+			
+
+			svc.updateMitigationAction(params,cb);
+		}
+
+		
+		service.UpdateProvisioningTemplate=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"templateName",params,undefined,false); 
+			
+			copyArg(msg,"templateName",params,undefined,false); 
+			copyArg(msg,"description",params,undefined,false); 
+			copyArg(msg,"enabled",params,undefined,false); 
+			copyArg(msg,"defaultVersionId",params,undefined,false); 
+			copyArg(msg,"provisioningRoleArn",params,undefined,false); 
+			copyArg(msg,"preProvisioningHook",params,undefined,true); 
+			copyArg(msg,"removePreProvisioningHook",params,undefined,false); 
+			
+
+			svc.updateProvisioningTemplate(params,cb);
 		}
 
 		
@@ -2214,6 +3168,11 @@ module.exports = function(RED) {
 			copyArg(msg,"securityProfileDescription",params,undefined,false); 
 			copyArg(msg,"behaviors",params,undefined,true); 
 			copyArg(msg,"alertTargets",params,undefined,true); 
+			copyArg(msg,"additionalMetricsToRetain",params,undefined,true); 
+			copyArg(msg,"additionalMetricsToRetainV2",params,undefined,true); 
+			copyArg(msg,"deleteBehaviors",params,undefined,false); 
+			copyArg(msg,"deleteAlertTargets",params,undefined,false); 
+			copyArg(msg,"deleteAdditionalMetricsToRetain",params,undefined,false); 
 			copyArg(msg,"expectedVersion",params,undefined,false); 
 			
 
@@ -2278,9 +3237,25 @@ module.exports = function(RED) {
 			copyArg(msg,"thingName",params,undefined,false); 
 			copyArg(msg,"thingGroupsToAdd",params,undefined,true); 
 			copyArg(msg,"thingGroupsToRemove",params,undefined,true); 
+			copyArg(msg,"overrideDynamicGroups",params,undefined,false); 
 			
 
 			svc.updateThingGroupsForThing(params,cb);
+		}
+
+		
+		service.UpdateTopicRuleDestination=function(svc,msg,cb){
+			var params={};
+			//copyArgs
+			
+			copyArg(n,"arn",params,undefined,false); 
+			copyArg(n,"status",params,undefined,false); 
+			
+			copyArg(msg,"arn",params,undefined,false); 
+			copyArg(msg,"status",params,undefined,false); 
+			
+
+			svc.updateTopicRuleDestination(params,cb);
 		}
 
 		
